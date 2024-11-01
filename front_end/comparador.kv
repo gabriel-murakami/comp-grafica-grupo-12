@@ -23,7 +23,7 @@
         hint_text: "Digite o nome"
         background_color: 0.95, 0.95, 1, 1
         multiline: False
-        input_filter: 'float'
+        input_filter: None
     Label:
         text: 'Sexo'
         font_size: 24
@@ -33,11 +33,10 @@
         hint_text: "Digite o sexo"
         background_color: 0.95, 0.95, 1, 1
         multiline: False
-        input_filter: 'float'
+        input_filter: None
     Label:
         text: 'Idade'
         hint_text: "Digite a idade"
-        input_filter: 'int'
         font_size: 24
         color: 0, 0, 0.5, 1
     TextInput:
@@ -46,7 +45,6 @@
         background_color: 0.95, 0.95, 1, 1
         input_filter: 'int'
         multiline: False
-        input_filter: 'float'
     Label:
         text: 'Etnia'
         font_size: 24
@@ -55,15 +53,14 @@
         id: ethnicity
         hint_text: "Digite a etnia"
         background_color: 0.95, 0.95, 1, 1
-        input_filter: 'int'
+        input_filter: None
         multiline: False
-        input_filter: 'float'
     Label:
         text: 'Altura (cm)'
         font_size: 24
         color: 0, 0, 0.5, 1
     TextInput:
-        id: hight
+        id: height
         hint_text: "Digite a altura"
         background_color: 0.95, 0.95, 1, 1
         multiline: False
