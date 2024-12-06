@@ -21,46 +21,58 @@ import numpy as np
 import trimesh
 
 class MeshApp(App):
-
     def build(self):
         self.title = 'Aplicativo de Carregamento de Malhas'
-
-        # Layout principal
         main_layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
-
-        # Sub-layout para os campos
         grid_layout = GridLayout(cols=2, row_force_default=True, row_default_height=40, spacing=10)
 
-        # Campos de entrada
-        self.name_input = TextInput(hint_text='Nome', multiline=False)
-        self.height_input = TextInput(hint_text='Altura', multiline=False)
+        self.ethnic_input = TextInput(hint_text='Etnia', multiline=False)
         self.weight_input = TextInput(hint_text='Peso', multiline=False)
-        self.other_input = TextInput(hint_text='Outro', multiline=False)
+        self.height_input = TextInput(hint_text='Altura', multiline=False)
+        self.age_input = TextInput(hint_text='Idade', multiline=False)
+        self.gender_input = TextInput(hint_text='Sexo', multiline=False)
 
-        grid_layout.add_widget(Label(text='Nome:', size_hint_x=None, width=100))
-        grid_layout.add_widget(self.name_input)
-        grid_layout.add_widget(Label(text='Altura:', size_hint_x=None, width=100))
-        grid_layout.add_widget(self.height_input)
-        grid_layout.add_widget(Label(text='Peso:', size_hint_x=None, width=100))
+        grid_layout.add_widget(Label(text='Etnia', size_hint_x=None, width=100))
+        grid_layout.add_widget(self.ethnic_input)
+        grid_layout.add_widget(Label(text='Peso', size_hint_x=None, width=100))
         grid_layout.add_widget(self.weight_input)
-        grid_layout.add_widget(Label(text='Outro:', size_hint_x=None, width=100))
-        grid_layout.add_widget(self.other_input)
+        grid_layout.add_widget(Label(text='Altura', size_hint_x=None, width=100))
+        grid_layout.add_widget(self.height_input)
+        grid_layout.add_widget(Label(text='Idade', size_hint_x=None, width=100))
+        grid_layout.add_widget(self.age_input)
+        grid_layout.add_widget(Label(text='Sexo', size_hint_x=None, width=100))
+        grid_layout.add_widget(self.gender_input)
 
         main_layout.add_widget(grid_layout)
 
-        # Botão para carregar a malha
         load_mesh_button = Button(text='Carregar Malha', size_hint=(1, None), height=50)
         load_mesh_button.bind(on_release=self.load_mesh)
         main_layout.add_widget(load_mesh_button)
 
-        # Label para mostrar o volume
         self.volume_label = Label(text='Volume da malha: ', size_hint=(1, None), height=50)
         main_layout.add_widget(self.volume_label)
 
+        calc_fat_button = Button(text='Calcular Gordura', size_hint=(1, None), height=50)
+        calc_fat_button.bind(on_release=self.calc_fat)
+        main_layout.add_widget(calc_fat_button)
+
+        self.fat_value = Label(text='Porcentagem de gordura: ', size_hint=(1, None), height=50)
+        main_layout.add_widget(self.fat_value)
+
         return main_layout
 
+    def calc_fat(self, instance):
+        mesh_volume = float(self.mesh_volume)
+        height = float(self.height_input.text)
+        weight = float(self.weight_input.text)
+        lung_volume = (((0.0472 * (height))+(0.000009 * weight))-5.92) * 1000
+
+        density = weight / (mesh_volume - lung_volume)
+
+        fat_percentage = 437 / density - 393
+        self.fat_value.text = f'Porcentagem de gordura: {fat_percentage:.2f}%'
+
     def load_mesh(self, instance):
-        # Abrir um Popup com o FileChooser
         content = BoxLayout(orientation='vertical')
         current_directory = os.getcwd()
         filechooser = FileChooserListView(path=current_directory, filters=["*.ply"])
@@ -68,32 +80,24 @@ class MeshApp(App):
 
         select_button = Button(text="Selecionar", size_hint=(1, 0.1))
         content.add_widget(select_button)
-        
+
         popup = Popup(title="Selecione a malha", content=content, size_hint=(0.9, 0.9))
-        
+
         def select_callback(instance):
             selection = filechooser.selection
             if selection:
                 popup.dismiss()
                 file_path = selection[0]
-                # Carregar a malha em uma thread separada
                 threading.Thread(target=self.process_mesh, args=(file_path,)).start()
-        
+
         select_button.bind(on_release=select_callback)
-        
         popup.open()
-    
+
     def process_mesh(self, file_path):
-        # Carregar a malha usando trimesh
         mesh = trimesh.load(file_path)
-
-        # Calcular o volume
         volume = mesh.volume
-
-        # Atualizar o label do volume na thread principal
         self.update_volume_label(volume)
-
-        # Mostrar a malha usando Panda3D
+        self.mesh_volume = volume
         self.show_mesh(file_path)
 
     @mainthread
@@ -101,9 +105,7 @@ class MeshApp(App):
         self.volume_label.text = f'Volume da malha: {volume:.2f}'
 
     def show_mesh(self, file_path):
-        # Executar view_mesh.py em um processo separado
-        subprocess.Popen([sys.executable, 'view_mesh.py', file_path])
-
+        subprocess.Popen([sys.executable, 'mesh_viewer.py', file_path])
 
 if __name__ == '__main__':
     MeshApp().run()
