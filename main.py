@@ -62,7 +62,8 @@ class MeshApp(App):
     def load_mesh(self, instance):
         # Abrir um Popup com o FileChooser
         content = BoxLayout(orientation='vertical')
-        filechooser = FileChooserListView(filters=["*.ply"])
+        current_directory = os.getcwd()
+        filechooser = FileChooserListView(path=current_directory, filters=["*.ply"])
         content.add_widget(filechooser)
 
         select_button = Button(text="Selecionar", size_hint=(1, 0.1))
