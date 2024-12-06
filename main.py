@@ -95,7 +95,7 @@ class MeshApp(App):
 
     def process_mesh(self, file_path):
         mesh = trimesh.load(file_path)
-        volume = mesh.volume
+        volume = mesh.volume / 1000.0
         self.update_volume_label(volume)
         self.mesh_volume = volume
         self.show_mesh(file_path)
